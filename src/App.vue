@@ -1,47 +1,83 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { reactive } from 'vue';
+
+  const state = reactive({
+    filter: 'All',
+    tasks: [
+      {
+        title: 'Estudar ES6',
+        isFinished: false,
+      },
+      {
+        title: 'Estudar SASS',
+        isFinished: false,
+      },
+      {
+        title: 'Ir para a academia',
+        isFinished: true,
+      },
+    ]
+  })
+  const getPendingTasks = () => {
+    return state.tasks.filter(task => !task.isFinished)
+  }
+  const getFinishedTasks = () => {
+    return state.tasks.filter(task => task.isFinished)
+  }
+  const getFilteredTasks = () => {
+    const { filter } = state;
+
+    switch(filter) {
+      case 'pending':
+        return getPendingTasks();
+      case 'finished':
+        return getFinishedTasks();
+      default:
+        return state.tasks;
+    }
+
+  }
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div class="container">
+    <header class="p-5 mb-4 mt-4 bg-light rounded-3">
+      <h1>Minhas Tarefas</h1>
+      <p>
+        Você Possui {{ getPendingTasks().length }} tarefas pendentes
+      </p>
+    </header>
+    <form>
+      <div class="row">
+        <div class="col">
+          <input type="text" placeholder="Descrição da Tarefa" class="form-control">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary" type="submit">Cadastras</button>
+        </div>
+        <div class="col-md-2">
+          <select @change="e => {if(e.target) state.filter = (e.target as HTMLOptionElement).value}" class="form-control">
+            <option value="all">Todas as Tarefas</option>
+            <option value="pending">Pendentes</option>
+            <option value="finished">Finalizadas</option>
+          </select>
+        </div>
+      </div>
+    </form>
+    <ul class="list-group mt-4">
+      <li class="list-group-item" v-for="task in getFilteredTasks()">
+        <input @change="e => {if (e.target) task.isFinished = (e.target as HTMLInputElement).checked}" :checked="task.isFinished" :id="task.title" type="checkbox">
+        <label :class="{done: task.isFinished}" :for="task.title" class="ms-3">
+          {{ task.title }}
+        </label>
+      </li>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    </ul>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+  .done {
+    text-decoration: line-through;
   }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>
