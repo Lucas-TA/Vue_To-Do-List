@@ -3,6 +3,11 @@ import { reactive } from 'vue';
 
   const state = reactive({
     filter: 'All',
+    inputTask: '',
+    newTask: {
+      title: '',
+      isFinished: false,
+    },
     tasks: [
       {
         title: 'Estudar ES6',
@@ -37,6 +42,13 @@ import { reactive } from 'vue';
     }
 
   }
+  const assignTask = () => {
+    const newTaskObj = {
+      title: state.newTask.title,
+      isFinished: false,
+    }
+    state.tasks.push(newTaskObj);
+  }
 </script>
 
 <template>
@@ -47,13 +59,13 @@ import { reactive } from 'vue';
         Você Possui {{ getPendingTasks().length }} tarefas pendentes
       </p>
     </header>
-    <form>
+    <form @submit.prevent="assignTask">
       <div class="row">
         <div class="col">
-          <input type="text" placeholder="Descrição da Tarefa" class="form-control">
+          <input :value="state.inputTask" @change="e => {if(e.target) state.newTask.title = (e.target as HTMLInputElement).value}" required type="text" placeholder="Descrição da Tarefa" class="form-control">
         </div>
         <div class="col-md-2">
-          <button class="btn btn-primary" type="submit">Cadastras</button>
+          <button class="btn btn-primary" type="submit">Cadastrar</button>
         </div>
         <div class="col-md-2">
           <select @change="e => {if(e.target) state.filter = (e.target as HTMLOptionElement).value}" class="form-control">
@@ -71,7 +83,6 @@ import { reactive } from 'vue';
           {{ task.title }}
         </label>
       </li>
-
     </ul>
   </div>
 </template>
